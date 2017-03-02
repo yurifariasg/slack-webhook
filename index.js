@@ -37,7 +37,7 @@ function usage_help(res) {
   res.send(JSON.stringify({
     text: "Available commands:\n" +
       "```\n" +
-       "build <project> \"<message>\" <branch default:master> <commit default:HEAD>\n" +
+       "build <pipeline slug> \"<message>\" <branch default:master> <commit default:HEAD>\n" +
        "Example: build spacex/rockets \"Building from Slack\"\n" +
       "```"
       // Add your own command help here
@@ -51,19 +51,19 @@ function build_command(text, req, res) {
   var orgProjMatch = buildCommandMatch[1].match(/(.*)\/(.*)/);
   if (orgProjMatch) {
     var org = orgProjMatch[1];
-    var project = orgProjMatch[2];
+    var pipeline = orgProjMatch[2];
   } else {
     var org = buildkite_default_org_slug;
-    var project = buildCommandMatch[1];
+    var pipeline = buildCommandMatch[1];
   }
 
   var message = buildCommandMatch[2];
   var branch = buildCommandMatch[3] || "master";
   var commit = buildCommandMatch[4] || "HEAD";
 
-  console.log("Build command", buildCommandMatch, org, project, message);
+  console.log("Build command", buildCommandMatch, org, pipeline, message);
 
-  post_to_buildkite('/v1/organizations/' + org + '/projects/' + project + '/builds', {
+  post_to_buildkite('/v2/organizations/' + org + '/pipelines/' + pipeline + '/builds', {
     branch: branch,
     commit: commit,
     message: message
